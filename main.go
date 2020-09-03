@@ -31,8 +31,7 @@ func main(){
 		log.Fatalf("Can't create temp dirs: %s", err)
 		os.Exit(1)
 	}
-	//defer os.Remove(connConfig.TempMetaDirPath)
-	//defer os.Remove(connConfig.TempDirPath)
+
 	defer os.RemoveAll(connConfig.TrampDir)
 
 	fmt.Println("Getting Remote File")
@@ -198,7 +197,6 @@ func scpLocalToRemote(connConfig config_handler.ConnectionConfig, remotepath str
 		return err
 	}
 
-	// Opens local file
 	f, _ := os.Open(localpath)
 
 	defer client.Close()
@@ -221,64 +219,28 @@ func scpRemoteToLocal(connConfig config_handler.ConnectionConfig, remotepath str
 	cmnd.Run() // and wait
 	//cmnd.Start()
 
-	//clientConfig, _ := auth.PrivateKey(connConfig.Username, connConfig.KeyFile, ssh.InsecureIgnoreHostKey())
-
-	//client := scp.NewClient(fmt.Sprintf("%s:%s", connConfig.Host, connConfig.Port), &clientConfig)
-
-	//err := client.Connect()
-	//if err != nil {
-	//	return err
-	//}
-
-	// Opens local file
-	//f, err := os.OpenFile(localpath, os.O_CREATE, 0777)
-	//f, err := os.Create(localpath)
-
-	//f, err := os.Open(localpath)
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-
-	//defer client.Close()
-	//defer f.Close()
-
-	// Copies remote file
-	//err = client.CopyFile(f, remotepath, "0777")
-	//if err != nil {
-	//	return err
-	//}
+	//todo add -i flag lol
 
 	return nil
 }
 
 func hashFileMD5(filePath string) (string, error) {
-	//Initialize variable returnMD5String now in case an error has to be returned
-	var returnMD5String string
+	var themd5 string
 
-	//Open the passed argument and check for any error
 	file, err := os.Open(filePath)
 	if err != nil {
-		return returnMD5String, err
+		return themd5, err
 	}
-
-	//Tell the program to call the following function when the current function returns
 	defer file.Close()
 
-	//Open a new hash interface to write to
 	hash := md5.New()
-
-	//Copy the file in the hash interface and check for any error
 	if _, err := io.Copy(hash, file); err != nil {
-		return returnMD5String, err
+		return themd5, err
 	}
 
-	//Get the 16 bytes hash
-	hashInBytes := hash.Sum(nil)[:16]
+	themd5 = hex.EncodeToString(hash.Sum(nil)[:16])
 
-	//Convert the bytes to a string
-	returnMD5String = hex.EncodeToString(hashInBytes)
-
-	return returnMD5String, nil
+	return themd5, nil
 
 }
 
